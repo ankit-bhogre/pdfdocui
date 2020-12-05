@@ -59,18 +59,16 @@ app.get('/servertest', async (req, res) => {
 })
 
 app.get('/getpdf', async (req, res) => {
-
-
-  
-  fs.readdir('./uploads/', (err, files) => {
+  let filespathUpload = path.join(__dirname, '/public/uploads/');
+  fs.readdir(filespathUpload, (err, files) => {
            var merger = new PDFMerger();
            let uniquefilename = Date.now() + Math.random() + "file";
                    (async () => { 
                     files.map(val=>{
-                      console.log('get sec arr',val);
-                            merger.add('./uploads/'+val);
+                      console.log('get files',val);
+                      merger.add(path.join(__dirname, '/public/uploads/',val));
                           });
-                     await merger.save('./uploadspdf/'+uniquefilename+'.pdf'); 
+                      await merger.save(path.join(__dirname, '/public/uploadspdf/',uniquefilename+'.pdf')); 
                      res.send({result:"success",url:uniquefilename+'.pdf'});
               })();
            })
@@ -78,14 +76,16 @@ app.get('/getpdf', async (req, res) => {
        
 
 app.post('/uploadpdf', async (req, res) => {
+  let filespathUpload = path.join(__dirname, '/public/uploads/');
+  let filespathMerged = path.join(__dirname, '/public/uploadspdf/');
           // for remove files in folder
-  fs.readdir('./uploads/', (err, files) => {
+  fs.readdir(filespathUpload, (err, files) => {
     console.log('get sec arr gettt',files.length);
     if (err) throw err;
     if(files.length > 0){
       i = 0;
     for (const file of files) {
-      fs.unlink('./uploads/'+file, err => {
+      fs.unlink(filespathUpload+file, err => {
         if (err) throw err;
         console.log('get sec arr gettt 01',files.length);
         i++
@@ -120,7 +120,7 @@ app.post('/uploadpdf', async (req, res) => {
 
             let photo = req.files.pdffiles[index];
             //move photo to uploads directory
-            photo.mv('./uploads/' + photo.name);
+            photo.mv(filespathUpload + photo.name);
             
             data.push({
                   name: photo.name,
@@ -137,12 +137,12 @@ app.post('/uploadpdf', async (req, res) => {
                     let pdfBuffer = await request.get({uri: val.pdffullpath, encoding: null});
                     // fs.writeFileSync('./uploads/'+val.pdfname, pdfBuffer);
                             try {
-                              fs.writeFileSync('./uploads/'+val.pdfname, pdfBuffer);
+                              fs.writeFileSync(filespathUpload+val.pdfname, pdfBuffer);
                               console.log('Success in writing file');
                               i++
                               console.log('new success',fileseqArray.length,i);
                               if(mainfilesArray.length == i){ 
-                                fs.readdir('./uploads/', (err, files) => {
+                                fs.readdir(filespathUpload, (err, files) => {
                                   if(fileseqArray.length == files.length){
                                     console.log('run meargin code with aside files //////');
                                         // sec - 4 ******************
@@ -174,7 +174,7 @@ app.post('/uploadpdf', async (req, res) => {
                          })
                      
                 }else{
-                   fs.readdir('./uploads/', (err, files) => {
+                   fs.readdir(filespathUpload, (err, files) => {
                     if( req.files.pdffiles.length == files.length){
                       // run without file mearging code-
                     console.log('run without file mearging code-',files.length);
@@ -217,18 +217,7 @@ app.post('/uploadpdf', async (req, res) => {
               // }
           })
 
-          function test(){
-            try{
-              var merger = new PDFMerger();
-                (async () => { 
-                    fileseqArray.map(val=>{
-                      console.log('check it with ar','./uploads/'+val.oldname)
-                      merger.add('./uploads/'+val.oldname);
-                    });
-                    await merger.save('./uploads/'+'uniquefilenametest.pdf'); 
-                  })();
-                }catch{console.log('cj er')}
-          }
+         
 
       // sec - 3 get all file name available in folder *****************************************
   
