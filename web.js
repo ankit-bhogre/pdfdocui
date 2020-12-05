@@ -36,7 +36,8 @@ app.get('/imgfileview', function(request, response) {
    const img = today <= 13 ? 'flooop.png' : 'flooop.png';
    console.log(__dirname);
    console.log(path.join(__dirname, '/public', img))
-   response.sendFile(path.join(__dirname, '/public', img));
+   response.send({newpath:path.join(__dirname, '/public', img)})
+  //  response.sendFile(path.join(__dirname, '/public', img));
 
 });
 // const http = require('http')
