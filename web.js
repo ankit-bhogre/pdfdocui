@@ -21,13 +21,24 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan('dev'));
-
+app.use(express.static('public'));
+const path = require('path');
 //start app 
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => 
   console.log(`App is listening on port ${port}.`)
 );
+
+
+app.get('/imgfileview', function(request, response) {
+    const today = new Date().getHours();
+   const img = today <= 13 ? 'flooop.png' : 'flooop.png';
+   console.log(__dirname);
+   console.log(path.join(__dirname, '/public', img))
+   response.sendFile(path.join(__dirname, '/public', img));
+
+});
 // const http = require('http')
 // const hostname = '127.0.0.1';
 // const port = 3000;
