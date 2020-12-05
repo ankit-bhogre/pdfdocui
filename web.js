@@ -58,22 +58,25 @@ app.get('/servertest', async (req, res) => {
   res.send({server:"working"})
 })
 
-app.get('/getpdf', async (req, res) => {
+app.post('/getpdf', async (req, res) => {
+
+
+  let fileseqArray =  JSON.parse(req.body.uniquedata);
+  // +++++++++++++
   let filespathUpload = path.join(__dirname, '/public/uploads/');
   fs.readdir(filespathUpload, (err, files) => {
            var merger = new PDFMerger();
            let uniquefilename = Date.now() + Math.random() + "file";
                    (async () => { 
-                    files.map(val=>{
-                      console.log('get files',val);
-                      merger.add(path.join(__dirname, '/public/uploads/',val));
-                          });
+                    fileseqArray.map(val=>{
+                            console.log('get files',val);
+                            merger.add(path.join(__dirname, '/public/uploads/',val.oldname));
+                                });
                       await merger.save(path.join(__dirname, '/public/uploadspdf/',uniquefilename+'.pdf')); 
                      res.send({result:"success",url:uniquefilename+'.pdf'});
               })();
            })
   })
-       
 
 app.post('/uploadpdf', async (req, res) => {
   let filespathUpload = path.join(__dirname, '/public/uploads/');
@@ -117,16 +120,18 @@ app.post('/uploadpdf', async (req, res) => {
   } else {
     let data = []; 
          req.files.pdffiles.forEach((val,index)=>{
-
+          
             let photo = req.files.pdffiles[index];
             //move photo to uploads directory
             photo.mv(filespathUpload + photo.name);
-            
+          
             data.push({
                   name: photo.name,
                   mimetype: photo.mimetype,
                   size: photo.size
               });
+             
+      
            // sec - 2 *****************************************
            if(index == req.files.pdffiles.length-1){ 
            
@@ -150,20 +155,7 @@ app.post('/uploadpdf', async (req, res) => {
                                           status: true,
                                           message: 'Success with files'
                                          });
-                                           
                                       
-                                    //     test();
-                                    // try{
-                                    //     var merger = new PDFMerger();
-                                    //       (async () => { 
-                                    //           fileseqArray.map(val=>{
-                                    //             console.log('check it with ar','./uploads/'+val.oldname)
-                                    //             merger.add('./uploads/'+val.oldname);
-                                    //           });
-                                    //           await merger.save('./uploads/'+'uniquefilenametest.pdf'); 
-                                    //         })();
-                                    //       }catch{console.log('cj er')}
-                                          // sec - 4 *****************
                                     }
                                 }) 
                                }
@@ -174,28 +166,16 @@ app.post('/uploadpdf', async (req, res) => {
                          })
                      
                 }else{
+                  
                    fs.readdir(filespathUpload, (err, files) => {
                     if( req.files.pdffiles.length == files.length){
                       // run without file mearging code-
-                    console.log('run without file mearging code-',files.length);
                      // sec - 4 ******************
-                    //  res.send( {result:'Success without files'});
-             
                      res.send({
                       status: true,
                       message: 'Success without files'
+
                      });
-                       
-                       
-                      // var merger = new PDFMerger();
-                      // (async () => { 
-                      //     fileseqArray.map(val=>{
-
-                      //       merger.add('./uploads/'+val.oldname);
-                      //     });
-                      //     await merger.save('./uploads/'+'uniquefilenametest.pdf'); 
-                      //   })();
-
                       // sec - 4 *****************
                     }
                   });
