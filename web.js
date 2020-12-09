@@ -32,13 +32,12 @@ app.listen(port, () =>
 
 
 app.get('/imgfileview', function(request, response) {
-    const today = new Date().getHours();
+   const today = new Date().getHours();
    const img = today <= 13 ? 'flooop.png' : 'flooop.png';
    console.log(__dirname);
    console.log(path.join(__dirname, '/public', img))
    response.send({newpath:path.join(__dirname, '/public', img)})
   //  response.sendFile(path.join(__dirname, '/public', img));
-
 });
 // const http = require('http')
 // const hostname = '127.0.0.1';
@@ -55,53 +54,89 @@ app.get('/imgfileview', function(request, response) {
 // });
 
 app.get('/servertest', async (req, res) => {
-  res.send({server:"working"})
+  res.send({server:"working 99+"})
 })
-
+//  Main Api
 app.post('/getpdf', async (req, res) => {
+  uploadfolderid = req.headers.loggeduserid;
+  mergefolderid = req.headers.userpdfdir;
+  let mergeUploadDir = path.join(__dirname, '/public/uploadspdf/'+mergefolderid);
+  let mergeUploadInside = path.join(__dirname, '/public/uploadspdf/'+mergefolderid+'/');
+  if (!fs.existsSync(mergeUploadDir)){
+    // for create folder
+    fs.mkdirSync(mergeUploadDir);
+  }
+    else{
 
-
+    }
   let fileseqArray =  JSON.parse(req.body.uniquedata);
   // +++++++++++++
-  let filespathUpload = path.join(__dirname, '/public/uploads/');
+  let filespathUpload = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid);
   fs.readdir(filespathUpload, (err, files) => {
            var merger = new PDFMerger();
            let uniquefilename = Date.now() + Math.random() + "file";
                    (async () => { 
                     fileseqArray.map(val=>{
                             console.log('get files',val);
-                            merger.add(path.join(__dirname, '/public/uploads/',val.oldname));
+                            merger.add(path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/',val.oldname));
                                 });
-                      await merger.save(path.join(__dirname, '/public/uploadspdf/',uniquefilename+'.pdf')); 
-                     res.send({result:"success",url:uniquefilename+'.pdf'});
+                      await merger.save(path.join(mergeUploadInside,uniquefilename+'.pdf')); 
+                     res.send({result:"success",url:uploadfolderid+'/'+uniquefilename+'.pdf'});
               })();
            })
   })
 
 app.post('/uploadpdf', async (req, res) => {
+  console.log('All headers value +-', req.files.pdffiles);
+  uploadfolderid = req.headers.loggeduserid;
   let filespathUpload = path.join(__dirname, '/public/uploads/');
   let filespathMerged = path.join(__dirname, '/public/uploadspdf/');
-          // for remove files in folder
-  fs.readdir(filespathUpload, (err, files) => {
-    console.log('get sec arr gettt',files.length);
-    if (err) throw err;
-    if(files.length > 0){
-      i = 0;
-    for (const file of files) {
-      fs.unlink(filespathUpload+file, err => {
-        if (err) throw err;
-        console.log('get sec arr gettt 01',files.length);
-        i++
-        if(files.length == i){ 
+  let masterhUploadDir = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid);
+  let masterhUploadInside = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/');
+  // console.log(JSON.stringify('All headers value',req.headers));
+
+  // +++++ check folder exist or not
+
+  if (!fs.existsSync(masterhUploadDir)){
+    // for create folder
+    fs.mkdirSync(masterhUploadDir);
+
+      // for remove files in folder
+
+    storeFiles();console.log('check test')
+ 
+// close remove folders
+}
+// if folder already exist
+else{
+    // for remove files in folder
+    fs.readdir(masterhUploadDir, async (err, files) => {
+      console.log('get sec arr gettt',files.length);
+      if (err) throw err;
+      if(files.length > 0){
+        i = 0;
+      for (const file of files) {
+        fs.unlink(masterhUploadInside+file, err => {
+          if (err) throw err;
+          console.log('get sec arr gettt 01',files.length);
+          i++
+          if(files.length == i){ 
+            
+            console.log('check test',i); 
+            storeFiles()}
+          // started new code for 
+         
+        });
+    }
+      }else{  storeFiles();console.log('check test');}
+    });
+  // close remove folders
           
-          console.log('check test',i); 
-          storeFiles()}
-        // started new code for 
-       
-      });
-  }
-    }else{  storeFiles();console.log('check test');}
-  });
+}
+  // +++++ check folder exist or not closed
+
+ 
+
 // close remove folders
         
          
@@ -123,7 +158,7 @@ app.post('/uploadpdf', async (req, res) => {
           
             let photo = req.files.pdffiles[index];
             //move photo to uploads directory
-            photo.mv(filespathUpload + photo.name);
+            photo.mv(masterhUploadInside + photo.name);
           
             data.push({
                   name: photo.name,
@@ -131,100 +166,63 @@ app.post('/uploadpdf', async (req, res) => {
                   size: photo.size
               });
              
+              
+      if(index == req.files.pdffiles.length-1){ 
+           
+        if(mainfilesArray.length>0){
+          var i=0;
+         mainfilesArray.map(async (val,index)=>{
+          console.log('Success in writing file 999',val.pdffullpath);
+        let pdfBuffer = await request.get({uri: val.pdffullpath, encoding: null});
+        // fs.writeFileSync('./uploads/'+val.pdfname, pdfBuffer);
+                try {
+                  fs.writeFileSync(masterhUploadInside+val.pdfname, pdfBuffer);
+                  console.log('Success in writing file');
+                  i++
+                  console.log('new success',fileseqArray.length,i);
+                  if(mainfilesArray.length == i){ 
+                    fs.readdir(masterhUploadDir, (err, files) => {
+                      if(fileseqArray.length == files.length){
+                        console.log('run meargin code with aside files //////');
+                            // sec - 4 ******************
+                            res.send({
+                              status: true,
+                              message: 'Success with files'
+                             });
+                          
+                        }
+                    }) 
+                   }
+                    } catch (err) {
+                        console.log('Error in writing file')
+                        console.log(err)
+                  }
+             })
+         
+    }else{
+      
+       fs.readdir(masterhUploadDir, (err, files) => {
+        if( req.files.pdffiles.length == files.length){
+          // run without file mearging code-
+         // sec - 4 ******************
+         res.send({
+          status: true,
+          message: 'Success without files'
+
+         });
+          // sec - 4 *****************
+        }
+      });
+    
+    }
+  }
+else{ 
+
+}
       
            // sec - 2 *****************************************
-           if(index == req.files.pdffiles.length-1){ 
-           
-                    if(mainfilesArray.length>0){
-                      var i=0;
-                     mainfilesArray.map(async (val,index)=>{
-                      console.log('Success in writing file 999',val.pdffullpath);
-                    let pdfBuffer = await request.get({uri: val.pdffullpath, encoding: null});
-                    // fs.writeFileSync('./uploads/'+val.pdfname, pdfBuffer);
-                            try {
-                              fs.writeFileSync(filespathUpload+val.pdfname, pdfBuffer);
-                              console.log('Success in writing file');
-                              i++
-                              console.log('new success',fileseqArray.length,i);
-                              if(mainfilesArray.length == i){ 
-                                fs.readdir(filespathUpload, (err, files) => {
-                                  if(fileseqArray.length == files.length){
-                                    console.log('run meargin code with aside files //////');
-                                        // sec - 4 ******************
-                                        res.send({
-                                          status: true,
-                                          message: 'Success with files'
-                                         });
-                                      
-                                    }
-                                }) 
-                               }
-                                } catch (err) {
-                                    console.log('Error in writing file')
-                                    console.log(err)
-                              }
-                         })
-                     
-                }else{
-                  
-                   fs.readdir(filespathUpload, (err, files) => {
-                    if( req.files.pdffiles.length == files.length){
-                      // run without file mearging code-
-                     // sec - 4 ******************
-                     res.send({
-                      status: true,
-                      message: 'Success without files'
-
-                     });
-                      // sec - 4 *****************
-                    }
-                  });
-                
-                }
-              }
-         else{ 
-          
-          }
-        
-
-       // sec - 2 *****************************************
-              // if(req.files.pdffiles.length == data.length){
-              //    res.send({
-              //   status: true,
-              //   message: 'Files are uploaded',
-              //   data: data
-              // });
-              // }
-          })
-
-         
-
-      // sec - 3 get all file name available in folder *****************************************
-  
-      // fs.readdir('./uploads/', (err, files) => {
-      //   console.log('ffff length 1',files.length);
-      //     console.log('ffff length 2',fileseqArray.length);
-      //   if(files.length == fileseqArray.length){
-      //     console.log('ffff length ',files.length);
-      //     console.log('ffff length ',fileseqArray.length);
-      //   }
-      //   files.forEach((file,index) => {
-      //   });
-      // });
       
-      // sec - 3 *******************************************************************************
-
-      // sec - 4 ******************
-
-      // fileseqArray.map(val=>{val.newfinalpath = './uploads/'+val.oldname});
-      // console.log('test array',fileseqArray);
-      // var merger = new PDFMerger();
-      // (async () => { 
-      //     merger.add('./uploads/abcd1.pdf');
-      //     merger.add('./uploads/abc1.pdf');
-      //     await merger.save('./uploads/'+'uniquefilenametest.pdf'); 
-      //   })();
-      // sec - 4 *****************
+          })
   }
   } catch (err) {
     res.status(500).send(err);

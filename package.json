@@ -25,6 +25,8 @@
     "pdf-merge": "^1.2.0",
     "pdf-merger-js": "^3.0.5",
     "pdftk": "0.0.0-rc.0",
+    "primeicons": "^4.1.0",
+    "primeng": "^11.0.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
     "stream": "0.0.2"
