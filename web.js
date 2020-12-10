@@ -54,8 +54,9 @@ app.get('/imgfileview', function(request, response) {
 // });
 
 app.get('/servertest', async (req, res) => {
-  res.send({server:"working 99+"})
-})
+  res.send({server:"working 99+ test"});
+});
+
 //  Main Api
 app.post('/getpdf', async (req, res) => {
   uploadfolderid = req.headers.loggeduserid;
