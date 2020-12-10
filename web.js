@@ -82,7 +82,7 @@ app.post('/getpdf', async (req, res) => {
                             merger.add(path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/',val.oldname));
                                 });
                       await merger.save(path.join(mergeUploadInside,uniquefilename+'.pdf')); 
-                     res.send({result:"success",url:uploadfolderid+'/'+uniquefilename+'.pdf'});
+                     res.send({result:"success",url:mergefolderid+'/'+uniquefilename+'.pdf'});
               })();
            })
   })
@@ -94,7 +94,7 @@ app.post('/uploadpdf', async (req, res) => {
   let filespathMerged = path.join(__dirname, '/public/uploadspdf/');
   let masterhUploadDir = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid);
   let masterhUploadInside = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/');
-  console.log('here one test',masterhUploadDir,masterhUploadDir,masterhUploadInside)
+  console.log('here one test',masterhUploadDir,masterhUploadInside,uploadfolderid)
   // console.log(JSON.stringify('All headers value',req.headers));
 
   // +++++ check folder exist or not
