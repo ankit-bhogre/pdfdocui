@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const _ = require('lodash');
 const PDFMerger = require('pdf-merger-js');
-
+const pdftk = require('node-pdftk');
 const app = express();
 var https = require('https');
 var fs = require('fs');
@@ -80,10 +80,11 @@ app.post('/getpdf', async (req, res) => {
                     fileseqArray.map(val=>{
                             console.log('get files',val);
                             merger.add(path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/',val.oldname));
-                                });
+                               });
                       await merger.save(path.join(mergeUploadInside,uniquefilename+'.pdf')); 
                      res.send({result:"success",url:mergefolderid+'/'+uniquefilename+'.pdf'});
               })();
+
            })
   })
 
