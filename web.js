@@ -54,16 +54,15 @@ app.get('/imgfileview', function(request, response) {
 // });
 
 app.get('/servertest', async (req, res) => {
-  res.send({server:"working 99+ test"});
+  res.send({server:"working 99+ test"})
 });
 
 //  Main Api
 app.post('/getpdf', async (req, res) => {
   uploadfolderid = req.headers.loggeduserid;
   mergefolderid = req.headers.userpdfdir;
-   let mergeUploadDir = path.join(__dirname, '/public/uploadspdf/'+mergefolderid);
-   let mergeUploadInside = path.join(__dirname, '/public/uploadspdf/'+mergefolderid+'/');
-
+  let mergeUploadDir = path.join(__dirname, '/public/uploadspdf/'+mergefolderid);
+  let mergeUploadInside = path.join(__dirname, '/public/uploadspdf/'+mergefolderid+'/');
   if (!fs.existsSync(mergeUploadDir)){
     // for create folder
     fs.mkdirSync(mergeUploadDir);
@@ -93,9 +92,8 @@ app.post('/uploadpdf', async (req, res) => {
   uploadfolderid = req.headers.loggeduserid;
   let filespathUpload = path.join(__dirname, '/public/uploads/');
   let filespathMerged = path.join(__dirname, '/public/uploadspdf/');
-   var masterhUploadDir = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid);
-   var masterhUploadInside = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/');
-  console.log('here is header value',mergeUploadDir,masterhUploadInside)
+  let masterhUploadDir = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid);
+  let masterhUploadInside = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/');
   // console.log(JSON.stringify('All headers value',req.headers));
 
   // +++++ check folder exist or not
@@ -162,7 +160,7 @@ else{
             let photo = req.files.pdffiles[index];
             //move photo to uploads directory
             photo.mv(masterhUploadInside + photo.name);
-            console.log('here is header value with',mergeUploadDir,masterhUploadInside,photo.name)
+          
             data.push({
                   name: photo.name,
                   mimetype: photo.mimetype,
@@ -205,9 +203,7 @@ else{
     }else{
       
        fs.readdir(masterhUploadDir, (err, files) => {
-        console.log('here is header value with one',mergeUploadDir,masterhUploadInside,files)
         if( req.files.pdffiles.length == files.length){
-
           // run without file mearging code-
          // sec - 4 ******************
          res.send({
