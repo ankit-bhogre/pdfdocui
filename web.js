@@ -59,8 +59,8 @@ app.get('/servertest', async (req, res) => {
 
 //  Main Api
 app.post('/getpdf', async (req, res) => {
-  uploadfolderid = req.headers.loggeduserid;
-  mergefolderid = req.headers.userpdfdir;
+  let uploadfolderid = req.headers.loggeduserid;
+  let mergefolderid = req.headers.userpdfdir;
   let mergeUploadDir = path.join(__dirname, '/public/uploadspdf/'+mergefolderid);
   let mergeUploadInside = path.join(__dirname, '/public/uploadspdf/'+mergefolderid+'/');
   if (!fs.existsSync(mergeUploadDir)){
@@ -89,11 +89,12 @@ app.post('/getpdf', async (req, res) => {
 
 app.post('/uploadpdf', async (req, res) => {
   console.log('All headers value +-', req.files.pdffiles);
-  uploadfolderid = req.headers.loggeduserid;
+  let uploadfolderid = req.headers.loggeduserid;
   let filespathUpload = path.join(__dirname, '/public/uploads/');
   let filespathMerged = path.join(__dirname, '/public/uploadspdf/');
   let masterhUploadDir = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid);
   let masterhUploadInside = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/');
+  console.log('here one test',masterhUploadDir,masterhUploadDir,masterhUploadInside)
   // console.log(JSON.stringify('All headers value',req.headers));
 
   // +++++ check folder exist or not
