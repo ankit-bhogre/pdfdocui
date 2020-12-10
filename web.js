@@ -93,8 +93,8 @@ app.post('/uploadpdf', async (req, res) => {
   uploadfolderid = req.headers.loggeduserid;
   let filespathUpload = path.join(__dirname, '/public/uploads/');
   let filespathMerged = path.join(__dirname, '/public/uploadspdf/');
-   masterhUploadDir = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid);
-  masterhUploadInside = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/');
+   var masterhUploadDir = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid);
+   var masterhUploadInside = path.join(__dirname, '/public/uploadsmaster/'+uploadfolderid+'/');
   console.log('here is header value',mergeUploadDir,masterhUploadInside)
   // console.log(JSON.stringify('All headers value',req.headers));
 
